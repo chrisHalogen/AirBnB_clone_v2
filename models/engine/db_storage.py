@@ -1,15 +1,14 @@
 #!/usr/bin/python3
-'''database storage engine'''
-
+'''DB Storage engine script'''
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 from models.amenity import Amenity
 from models.base_model import Base
-from models.city import City
-from models.place import Place
-from models.review import Review
-from models.state import State
 from models.user import User
+from models.place import Place
+from models.city import City
+from models.state import State
+from models.review import Review
 from os import getenv
 
 if getenv('HBNB_TYPE_STORAGE') == 'db':
@@ -20,17 +19,17 @@ classes = {"User": User, "State": State, "City": City,
 
 
 class DBStorage:
-    '''database storage engine for mysql storage'''
+    '''storage for mysql'''
     __engine = None
     __session = None
 
     def __init__(self):
-        '''instantiate new dbstorage instance'''
+        '''instantiating storage'''
         HBNB_MYSQL_USER = getenv('HBNB_MYSQL_USER')
-        HBNB_MYSQL_PWD = getenv('HBNB_MYSQL_PWD')
         HBNB_MYSQL_HOST = getenv('HBNB_MYSQL_HOST')
-        HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
+        HBNB_MYSQL_PWD = getenv('HBNB_MYSQL_PWD')
         HBNB_ENV = getenv('HBNB_ENV')
+        HBNB_MYSQL_DB = getenv('HBNB_MYSQL_DB')
         self.__engine = create_engine(
             'mysql+mysqldb://{}:{}@{}/{}'.format(
                                            HBNB_MYSQL_USER,
@@ -43,27 +42,25 @@ class DBStorage:
             Base.metadata.drop_all(self.__engine)
 
     def all(self, cls=None):
-        '''query on the current db session all cls objects
-        this method must return a dictionary: (like FileStorage)
-        key = <class-name>.<object-id>
-        value = object
+        '''returns all class objects. If cls is not none,
+        returns cls objects alone
         '''
-        dct = {}
+        object_dict = {}
         if cls is None:
-            for c in classes.values():
-                objs = self.__session.query(c).all()
-                for obj in objs:
-                    key = obj.__class__.__name__ + '.' + obj.id
-                    dct[key] = obj
+            for model_class in classes.values():
+                query_result = self.__session.query(model_class).all()
+                for single in query_result:
+                    key = single.__class__.__name__ + '.' + single.id
+                    object_dict[key] = single
         else:
-            objs = self.__session.query(cls).all()
-            for obj in objs:
-                key = obj.__class__.__name__ + '.' + obj.id
-                dct[key] = obj
-        return dct
+            query_result = self.__session.query(cls).all()
+            for single in query_result:
+                key = single.__class__.__name__ + '.' + single.id
+                object_dict[key] = single
+        return object_dict
 
     def new(self, obj):
-        '''adds the obj to the current db session'''
+        '''Creates new object'''
         if obj is not None:
             try:
                 self.__session.add(obj)
@@ -74,24 +71,23 @@ class DBStorage:
                 raise ex
 
     def save(self):
-        '''commit all changes of the current db session'''
+        '''commits changes'''
         self.__session.commit()
 
     def delete(self, obj=None):
-        ''' deletes from the current databse session the obj
-            is it's not None
+        ''' removes data from db
         '''
         if obj is not None:
             self.__session.query(type(obj)).filter(
                 type(obj).id == obj.id).delete()
 
     def reload(self):
-        '''reloads the database'''
+        '''triggers database reload'''
         Base.metadata.create_all(self.__engine)
         session_factory = sessionmaker(bind=self.__engine,
                                        expire_on_commit=False)
         self.__session = scoped_session(session_factory)()
 
     def close(self):
-        """closes the working SQLAlchemy session"""
+        """quits the current working session"""
         self.__session.close()
