@@ -10,12 +10,12 @@ Base = declarative_base()
 
 
 class BaseModel:
-    """A base class for all hbnb models
+    """A base class for all hbnb data models
 
     Attributes:
-        id (sqlalchemy String): The BaseModel id.
-        created_at (sqlalchemy DateTime): The datetime at creation.
-        updated_at (sqlalchemy DateTime): The datetime of last update.
+        id (sqlalchemy String): The BaseModel id of the object.
+        created_at (sqlalchemy DateTime): The datetime at object creation.
+        updated_at (sqlalchemy DateTime): The datetime of object last update.
     """
     id = Column(String(60),
                 nullable=False,
@@ -62,14 +62,14 @@ class BaseModel:
 
     def to_dict(self):
         """Convert instance into dict format"""
-        dct = self.__dict__.copy()
-        dct['__class__'] = self.__class__.__name__
-        for k in dct:
-            if type(dct[k]) is datetime:
-                dct[k] = dct[k].isoformat()
-        if '_sa_instance_state' in dct.keys():
-            del(dct['_sa_instance_state'])
-        return dct
+        obj_copy_dict = self.__dict__.copy()
+        obj_copy_dict['__class__'] = self.__class__.__name__
+        for k in obj_copy_dict:
+            if type(obj_copy_dict[k]) is datetime:
+                obj_copy_dict[k] = obj_copy_dict[k].isoformat()
+        if '_sa_instance_state' in obj_copy_dict.keys():
+            del(obj_copy_dict['_sa_instance_state'])
+        return obj_copy_dict
 
     def delete(self):
         '''deletes the current instance from the storage'''

@@ -1,13 +1,13 @@
 #!/usr/bin/python3
 """ Place Module for HBNB project """
 
-from models.amenity import Amenity
 from models.review import Review
+from models.amenity import Amenity
 from models.base_model import BaseModel, Base
 from models import storage_type
 from sqlalchemy import Column, String, Integer, Float, ForeignKey
-from sqlalchemy.sql.schema import Table
 from sqlalchemy.orm import relationship
+from sqlalchemy.sql.schema import Table
 
 
 if storage_type == 'db':
@@ -56,37 +56,32 @@ class Place(BaseModel, Base):
 
         @property
         def reviews(self):
-            ''' returns list of review instances with place_id
-                equals to the cyrrent Place.id
-                FileStorage relationship between Place and Review
+            ''' returns a list of reviews
             '''
             from models import storage
-            all_revs = storage.all(Review)
-            lst = []
-            for rev in all_revs.values():
-                if rev.place_id == self.id:
-                    lst.append(rev)
-            return lst
+            all_reviews = storage.all(Review)
+            output_list = []
+            for single_review in all_reviews.values():
+                if single_review.place_id == self.id:
+                    output_list.append(single_review)
+            return output_list
 
         @property
         def amenities(self):
-            ''' returns the list of Amenity instances
-                based on the attribute amenity_ids that
-                contains all Amenity.id linked to the Place
+            ''' input - Amenity ID
+                Output - Amenities
             '''
             from models import storage
-            all_amens = storage.all(Amenity)
-            lst = []
-            for amen in all_amens.values():
+            all_amenities = storage.all(Amenity)
+            ourput_list = []
+            for amen in all_amenities.values():
                 if amen.id in self.amenity_ids:
-                    lst.append(amen)
-            return lst
+                    ourput_list.append(amen)
+            return ourput_list
 
         @amenities.setter
         def amenities(self, obj):
-            ''' method for adding an Amenity.id to the
-                attribute amenity_ids. accepts only Amenity
-                objects
+            ''' adding an Amenity.id to theattribute amenity_ids
             '''
             if obj is not None:
                 if isinstance(obj, Amenity):
