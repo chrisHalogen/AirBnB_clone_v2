@@ -10,6 +10,7 @@ class User(BaseModel, Base):
     """Class for the User Object"""
     __tablename__ = 'users'
     if storage_type == 'db':
+        """ DB Storage Columns """
         email = Column(String(128), nullable=False)
         password = Column(String(128), nullable=False)
         first_name = Column(String(128), nullable=True)
@@ -19,6 +20,7 @@ class User(BaseModel, Base):
         reviews = relationship('Review', backref='user',
                                cascade='all, delete, delete-orphan')
     else:
+        """ File Storage Columns """
         email = ""
         password = ""
         first_name = ""

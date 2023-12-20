@@ -24,9 +24,10 @@ if storage_type == 'db':
 
 
 class Place(BaseModel, Base):
-    """ A place to stay """
+    """ The place model """
     __tablename__ = 'places'
     if storage_type == 'db':
+        """ For DB Storage, use SQL Alchemy Columns """
         city_id = Column(String(60), ForeignKey('cities.id'), nullable=False)
         user_id = Column(String(60), ForeignKey('users.id'), nullable=False)
         name = Column(String(128), nullable=False)
@@ -42,6 +43,7 @@ class Place(BaseModel, Base):
         amenities = relationship('Amenity', secondary=place_amenity,
                                  viewonly=False, backref='place_amenities')
     else:
+        """ For File Storage, python native data type """
         city_id = ""
         user_id = ""
         name = ""
