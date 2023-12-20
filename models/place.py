@@ -70,8 +70,8 @@ class Place(BaseModel, Base):
 
         @property
         def amenities(self):
-            ''' input - Amenity ID
-                Output - Amenities
+            ''' input - amenity id
+                Output - list of amenities
             '''
             from models import storage
             all_amenities = storage.all(Amenity)
